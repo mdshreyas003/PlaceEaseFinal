@@ -23,7 +23,7 @@ def register():
                 db.session.add(user)
                 db.session.add(teacher)
             db.session.commit()
-            send_verification_email(user)
+            # send_verification_email(user)
             flash(f"Account has been created and a verification link has been sent to {form.email.data} !!", 'success')
             return redirect(url_for("auth.login"))
         return render_template("register.html",form = form,title = "Register")
@@ -38,19 +38,19 @@ def register():
 def login():
     if current_user.is_authenticated == False:
         form = LoginForm()
-        if form.validate_on_submit():
+        if form.validate_on_submit(): #check how validation works here
             user = User.query.filter_by(email=form.email.data).first()
             if user and bcrypt.check_password_hash(user.password, form.password.data):
-                if user.verified:
-                    if user.student is not None:
-                        login_user(user, remember=False)    
-                        return redirect(url_for('student.home'))
-                    if user.teacher is not None:
-                        login_user(user, remember=False)    
-                        return redirect(url_for('teacher.home'))
-                else:
-                    flash(f"Your email has not been verified yet. A link has been sent to {user.email} for verification","warning")
-                    return redirect(url_for('auth.login'))
+                #if user.verified:
+                if user.student is not None:
+                    login_user(user, remember=False)    
+                    return redirect(url_for('student.home'))
+                if user.teacher is not None:
+                    login_user(user, remember=False)    
+                    return redirect(url_for('teacher.home'))
+                # else:
+                #     flash(f"Your email has not been verified yet. A link has been sent to {user.email} for verification","warning")
+                #     return redirect(url_for('auth.login'))
             else:
                 flash("Incorrect email or password please try again","danger")
                 return redirect(url_for('auth.login'))

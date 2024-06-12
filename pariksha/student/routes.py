@@ -4,6 +4,7 @@ from pariksha import db
 from pariksha.student.utils import shuffle,random
 from pariksha.models import Student,Teacher,Quiz
 from pariksha.student.utils import bar_graph
+from sqlalchemy.sql import text
 import copy
 
 
@@ -85,9 +86,9 @@ def quiz_post(quiz_id):
     
     current_user.student.submitted_quiz.append(quiz)
     db.session.commit()
-    db.session.execute(f'UPDATE submits_quiz SET marks = {marks} WHERE student_id = {current_user.student.id} and quiz_id = {quiz_id};')
+    db.session.execute('UPDATE submits_quiz SET marks = {marks} WHERE student_id = {current_user.student.id} and quiz_id = {quiz_id};')
     db.session.commit()
-    flash(f'Your response for Quiz : {quiz.title} has been submitted','success')
+    flash('Your response for Quiz : {quiz.title} has been submitted','success')
     return redirect(url_for('student.home'))
 
 @student.route("/list_quiz")
@@ -110,12 +111,12 @@ def view_performance():
         flash('Access Denied','danger')
         return redirect(url_for('teacher.home'))
     student = current_user.student
-    quiz_submitted_query = tuple(db.session.execute(f'SELECT * FROM submits_quiz WHERE student_id = {student.id};'))
+    quiz_submitted_query = tuple(db.session.execute('SELECT * FROM submits_quiz WHERE student_id = {student.id};'))
     quiz_submitted = list()
     
     for quiz in quiz_submitted_query:
         quiz_title = Quiz.query.filter_by(id = quiz[1]).first().title
-        all_marks = list(db.session.execute(f'SELECT marks FROM submits_quiz WHERE quiz_id = {quiz[1]}'))
+        all_marks = list(db.session.execute('SELECT marks FROM submits_quiz WHERE quiz_id = {quiz[1]}'))
         all_marks = [x[0] for x in all_marks]
         quiz_submitted.append(dict(quiz_title = quiz_title,marks = quiz[3],all_marks = all_marks ))
     graph = bar_graph(quiz_submitted)
@@ -129,7 +130,7 @@ def view_result():
         flash('Access Denied','danger')
         return redirect(url_for('teacher.home'))
     student = current_user.student
-    quiz_submitted_query = tuple(db.session.execute(f'SELECT * FROM submits_quiz WHERE student_id = {student.id};'))
+    quiz_submitted_query = tuple(db.session.execute(text('SELECT * FROM submits_quiz WHERE student_id = {student.id};')))
     quiz_submitted = list()
     
     for quiz in quiz_submitted_query:
@@ -155,7 +156,7 @@ def add_teacher():
         teacher_id = request.form['teacher_id']
         teacher = Teacher.query.filter_by(id = teacher_id).first()
         if teacher is None:
-            flash(f'Teacher with teacher id {teacher_id} does not exist','danger')
+            flash('Teacher with teacher id {teacher_id} does not exist','danger')
             return redirect(url_for('student.add_teacher'))
         if current_user.student in teacher.students:
             flash('The teacher is already added','info')
