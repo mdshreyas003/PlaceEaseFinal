@@ -7,6 +7,6 @@ class Config():
     #mail port info ends
 
     #add email and password 
-    MAIL_USERNAME = "pariksha.contact@gmail.com"
+    MAIL_USERNAME = "placeEase.contact@gmail.com"
     MAIL_PASSWORD = "pycavmail"
-    SQLALCHEMY_DATABASE_URI = "sqlite:///C:/Users/Sanjana/Desktop/devops/PARiKSHA/pariksha/site.db"
+    SQLALCHEMY_DATABASE_URI = "sqlite:///C:/Users/Srujan/Desktop/final/PlaceEase/pariksha/site.db"
