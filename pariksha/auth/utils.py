@@ -18,7 +18,7 @@ If you did not make this requet please ignore.
 def send_reset_email(user):
     token = user.get_reset_token()
     message = Message("Reset Password",
-        sender = "PARiKSHA<pariksha.contact@gmail.com>",
+        sender = "PARiKSHA<placeease.contact@gmail.com>",
         recipients=[user.email])
     message.body = f''' To reset your password visit the link:
 {url_for('auth.reset_password', token = token, _external=True )}

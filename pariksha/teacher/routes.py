@@ -5,6 +5,7 @@ from pariksha import db
 import datetime
 import csv
 import os
+from sqlalchemy.sql import text
 
 teacher = Blueprint('teacher',__name__,url_prefix="/teacher",template_folder='templates')
 
@@ -103,7 +104,9 @@ def view_performance(quiz_id):
         return redirect(url_for('student.home'))
     quiz = Quiz.query.filter_by(id = quiz_id).first_or_404()
     teacher = current_user.teacher
-    marks = list(db.session.execute(f'SELECT student_id,marks FROM submits_quiz WHERE quiz_id = {quiz_id}'))
+    query = text('SELECT student_id,marks FROM submits_quiz WHERE quiz_id = :quiz_id')
+    query = query.bindparams(quiz_id=quiz_id)
+    marks = list(db.session.execute(query).all())
     data = list()
     for i,entry in enumerate(marks):
         student_name = Student.query.filter_by(id = entry[0]).first().user.name
@@ -123,7 +126,7 @@ def view_performance(quiz_id):
                 writer.writeheader()
                 for entry in data:
                     writer.writerow(entry)
-            return send_from_directory(directory='results', filename=f'{quiz.title}_results.csv', as_attachment = True)
+            return send_from_directory(directory='results', filename=f'{quiz.title}_results.csv', as_attachment = True, path='http://localhost:5000/teacher/home')
         except IOError:
             flash('Downloading Error Occured','warning')
             return redirect(url_for('teacher.home'))
